@@ -967,6 +967,289 @@
         margin: 34px 0 64px;
       }
 
+      .quiz-setup,
+      .quiz-session,
+      .quiz-results {
+        margin-top: 28px;
+        padding: 26px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+      }
+
+      .quiz-session,
+      .quiz-results {
+        border-top: 7px solid var(--part-purple);
+      }
+
+      .quiz-setup h3,
+      .quiz-session h3,
+      .quiz-results h3 {
+        margin: 0 0 12px;
+        color: var(--navy-deep);
+      }
+
+      .quiz-question-nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .quiz-question-nav button,
+      .quiz-actions button,
+      .quiz-self-check button,
+      .quiz-result-actions button {
+        min-height: 44px;
+        padding: 10px 14px;
+        border: 1px solid var(--navy);
+        background: var(--paper);
+        color: var(--navy);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+      }
+
+      .quiz-question-nav button:hover,
+      .quiz-actions button:hover,
+      .quiz-self-check button:hover,
+      .quiz-result-actions button:hover {
+        background: var(--cover-blue-light);
+      }
+
+      .quiz-chapter-picker {
+        margin-top: 20px;
+      }
+
+      .quiz-heading-row,
+      .quiz-actions,
+      .quiz-result-actions,
+      .quiz-self-check {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .quiz-heading-row h3 {
+        margin: 0;
+      }
+
+      .quiz-progress {
+        color: var(--muted);
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      .quiz-question-nav {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+      }
+
+      .quiz-question-nav button {
+        padding: 8px;
+      }
+
+      .quiz-question-nav button[aria-current="step"] {
+        border-color: var(--navy);
+        background: var(--navy);
+        color: var(--paper);
+      }
+
+      .quiz-question-nav button.is-correct:not([aria-current="step"]) {
+        border-color: #426b4d;
+        background: #eaf1e9;
+        color: #254a30;
+      }
+
+      .quiz-question-nav button.is-incorrect:not([aria-current="step"]) {
+        border-color: var(--chapter-red);
+        background: #fff1f2;
+        color: #892034;
+      }
+
+      .quiz-question-card {
+        margin-top: 24px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        background: var(--cover-blue-light);
+      }
+
+      .quiz-question-card h4 {
+        margin: 0 0 18px;
+        color: var(--navy-deep);
+        font-size: clamp(1.18rem, 2.4vw, 1.55rem);
+        line-height: 1.4;
+      }
+
+      .quiz-question-kicker {
+        margin-bottom: 10px !important;
+        color: var(--chapter-red) !important;
+        font-size: 0.76rem;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .quiz-answer-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .quiz-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 13px 15px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        line-height: 1.5;
+        cursor: pointer;
+      }
+
+      .quiz-option input {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        margin: 2px 0 0;
+        accent-color: var(--navy);
+      }
+
+      .quiz-option:has(input:checked) {
+        border-color: var(--navy);
+        box-shadow: inset 0 0 0 1px var(--navy);
+      }
+
+      .quiz-written-answer,
+      .quiz-student-name {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        color: var(--ink);
+        font: inherit;
+        line-height: 1.5;
+      }
+
+      .quiz-written-answer {
+        min-height: 132px;
+        resize: vertical;
+      }
+
+      .quiz-feedback {
+        margin-top: 18px !important;
+        padding: 16px;
+        border-left: 5px solid var(--navy);
+        background: var(--paper);
+        color: var(--ink) !important;
+        line-height: 1.55;
+      }
+
+      .quiz-feedback.is-correct {
+        border-color: #426b4d;
+      }
+
+      .quiz-feedback.is-incorrect {
+        border-color: var(--chapter-red);
+      }
+
+      .quiz-reference-answer {
+        display: block;
+        margin-top: 10px;
+        white-space: pre-wrap;
+      }
+
+      .quiz-self-check {
+        justify-content: flex-start;
+        margin-top: 16px;
+      }
+
+      .quiz-actions,
+      .quiz-result-actions {
+        justify-content: flex-start;
+        margin-top: 20px;
+      }
+
+      .quiz-actions .primary,
+      .quiz-result-actions .primary,
+      .quiz-self-check .primary {
+        background: var(--navy);
+        color: var(--paper);
+      }
+
+      .quiz-actions .primary:hover,
+      .quiz-result-actions .primary:hover,
+      .quiz-self-check .primary:hover {
+        background: var(--navy-deep);
+      }
+
+      .quiz-actions button:disabled {
+        border-color: var(--line);
+        background: #e6e9ef;
+        color: #707782;
+        cursor: not-allowed;
+      }
+
+      .quiz-actions .quiz-finish {
+        margin-left: auto;
+      }
+
+      .quiz-status {
+        min-height: 1.5em;
+        margin-top: 12px !important;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .quiz-score {
+        margin: 18px 0 !important;
+        color: var(--navy-deep) !important;
+        font-size: clamp(2.3rem, 6vw, 4rem);
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .quiz-result-list {
+        display: grid;
+        gap: 8px;
+        margin: 22px 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .quiz-result-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 11px 14px;
+        border: 1px solid var(--line);
+        background: var(--cover-blue-light);
+      }
+
+      .quiz-result-list button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--navy);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 800;
+        text-align: left;
+        text-decoration: underline;
+      }
+
+      .quiz-report-field {
+        display: block;
+        max-width: 380px;
+        margin-top: 24px;
+        color: var(--navy-deep);
+        font-weight: 800;
+      }
+
+      .quiz-student-name {
+        margin-top: 8px;
+        font-weight: 400;
+      }
+
       :focus-visible {
         outline: 3px solid var(--chapter-red);
         outline-offset: 4px;
@@ -1041,6 +1324,21 @@
 
         .chapter-options {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .quiz-question-nav {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .quiz-setup,
+        .quiz-session,
+        .quiz-results,
+        .quiz-question-card {
+          padding: 18px;
+        }
+
+        .quiz-actions .quiz-finish {
+          margin-left: 0;
         }
 
         .flashcard-setup,
@@ -1183,6 +1481,20 @@
               </div>
               <span class="activity-action">
                 Open flash cards
+                <span class="activity-arrow" aria-hidden="true">&rarr;</span>
+              </span>
+            </a>
+
+            <a href="#chapter-quizzes" class="activity-card">
+              <div class="card-topline">
+                <span class="activity-number">05</span>
+              </div>
+              <div>
+                <h3>Chapter Quizzes</h3>
+                <p>Choose a chapter, answer its questions, and check your results. Download a report to share with your instructor.</p>
+              </div>
+              <span class="activity-action">
+                Open chapter quizzes
                 <span class="activity-arrow" aria-hidden="true">&rarr;</span>
               </span>
             </a>
@@ -1685,12 +1997,89 @@
       </main>
     </div>
 
+    <div class="interior-page" data-view="chapter-quizzes" hidden>
+      <header class="interior-hero">
+        <div class="interior-heading">
+          <a href="#home" class="back-link">&larr; Back to all resources</a>
+          <p class="eyebrow">Resource 05</p>
+          <h1 tabindex="-1">Chapter Quizzes</h1>
+        </div>
+      </header>
+      <main id="chapter-quizzes-content" class="resource-panel">
+        <h2>Chapter Quizzes</h2>
+        <p class="resource-intro-wide">
+          Choose a chapter and work through its 10 questions in any order. Each question can be submitted once; retry the whole quiz for another attempt. After completing the quiz, review your answers
+          or download your results for your instructor.
+        </p>
+
+        <section class="quiz-setup" id="quiz-setup" aria-labelledby="quiz-setup-title">
+          <h3 id="quiz-setup-title">Choose a Chapter</h3>
+          <p>Each chapter has a separate 10-question quiz. You can switch chapters at any time; starting another quiz clears your current answers and results.</p>
+          <details class="chapter-picker quiz-chapter-picker" id="quiz-chapter-picker">
+            <summary id="quiz-chapter-summary">Choose a chapter</summary>
+            <div class="chapter-picker-content">
+              <div class="chapter-options" id="quiz-chapter-list" role="radiogroup" aria-label="Chapter quiz"></div>
+            </div>
+          </details>
+          <div class="flashcard-setup-footer">
+            <button class="study-control primary" id="quiz-start" type="button" disabled>Start Quiz</button>
+          </div>
+        </section>
+
+        <section class="quiz-session" id="quiz-session" aria-labelledby="quiz-session-title" hidden>
+          <div class="quiz-heading-row">
+            <h3 id="quiz-session-title">Chapter Quiz</h3>
+            <span class="quiz-progress" id="quiz-progress"></span>
+          </div>
+          <nav class="quiz-question-nav" id="quiz-question-nav" aria-label="Quiz questions"></nav>
+          <div class="quiz-question-card">
+            <p class="quiz-question-kicker" id="quiz-question-kicker"></p>
+            <h4 id="quiz-question-title"></h4>
+            <div id="quiz-answer-controls"></div>
+            <div class="quiz-feedback" id="quiz-feedback" role="status" aria-live="polite" hidden></div>
+            <div class="quiz-self-check" id="quiz-self-check" hidden>
+              <button class="primary" id="quiz-mark-correct" type="button">My Answer Is Correct</button>
+              <button id="quiz-mark-incorrect" type="button">My Answer Needs Review</button>
+            </div>
+          </div>
+          <p class="quiz-status" id="quiz-status" role="status" aria-live="polite"></p>
+          <div class="quiz-actions">
+            <button id="quiz-previous" type="button">Previous</button>
+            <button id="quiz-next" type="button">Next</button>
+            <button class="primary" id="quiz-submit" type="button">Submit Answer</button>
+            <button class="quiz-finish primary" id="quiz-finish" type="button" disabled>See Results</button>
+            <button id="quiz-back-results" type="button" hidden>Back to Results</button>
+          </div>
+        </section>
+
+        <section class="quiz-results" id="quiz-results" aria-labelledby="quiz-results-title" hidden>
+          <p class="status-label">Quiz Complete</p>
+          <h3 id="quiz-results-title">Chapter Quiz Results</h3>
+          <p class="quiz-score" id="quiz-score"></p>
+          <p id="quiz-results-summary"></p>
+          <ol class="quiz-result-list" id="quiz-result-list"></ol>
+          <label class="quiz-report-field" for="quiz-student-name">
+            Your Name for the Results Report
+            <input class="quiz-student-name" id="quiz-student-name" type="text" autocomplete="name" maxlength="120" required />
+          </label>
+          <p class="quiz-status" id="quiz-download-status" role="status" aria-live="polite"></p>
+          <div class="quiz-result-actions">
+            <button class="primary" id="quiz-download" type="button">Download Results PDF</button>
+            <button id="quiz-review" type="button">Review Answers</button>
+            <button id="quiz-retry" type="button">Retry Quiz</button>
+            <button id="quiz-choose-chapter" type="button">Choose Another Chapter</button>
+          </div>
+        </section>
+        <a href="#home" class="back-link">&larr; Back to all resources</a>
+      </main>
+    </div>
+
     <script src="Assets/Flash Cards/flashcards-data.js"></script>
     <script src="Assets/Check Sheets/check-sheets-data.js"></script>
     <script src="Assets/Case study/case-studies-data.js"></script>
     <script>
       (function () {
-        const views = new Set(["home", "case-studies", "check-sheets", "skills-videos", "flash-cards"]);
+        const views = new Set(["home", "case-studies", "check-sheets", "skills-videos", "flash-cards", "chapter-quizzes"]);
         const videoButtons = Array.from(document.querySelectorAll("[data-video-url]"));
         const videoPlayerPanel = document.getElementById("video-player-panel");
         const videoPlayerTitle = document.getElementById("video-player-title");
@@ -2225,5 +2614,7 @@
         showView(false);
       })();
     </script>
+    <script src="Assets/Quizzes/quizzes-data.js"></script>
+    <script src="Assets/Quizzes/quiz-app.js"></script>
   </body>
 </html>
