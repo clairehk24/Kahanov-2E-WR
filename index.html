@@ -632,7 +632,8 @@
         gap: 28px;
       }
 
-      .video-search-label {
+      .video-search-label,
+      .check-sheet-search-label {
         display: grid;
         flex: 0 1 330px;
         gap: 7px;
@@ -643,7 +644,8 @@
         text-transform: uppercase;
       }
 
-      .video-search-input {
+      .video-search-input,
+      .check-sheet-search-input {
         width: 100%;
         min-height: 44px;
         padding: 10px 13px;
@@ -1365,7 +1367,8 @@
           flex-direction: column;
         }
 
-        .video-search-label {
+        .video-search-label,
+        .check-sheet-search-label {
           flex-basis: auto;
         }
 
@@ -1554,8 +1557,16 @@
         </div>
       </header>
       <main id="check-sheets-content" class="resource-panel">
-        <h2>Check Sheets</h2>
-        <p>Choose a chapter to view and download the foundational skills check sheets.</p>
+        <div class="video-library-heading">
+          <div>
+            <h2>Check Sheets</h2>
+            <p>Choose a chapter to view and download the foundational skills check sheets.</p>
+          </div>
+          <label class="check-sheet-search-label" for="check-sheet-search">
+            Filter check sheets
+            <input id="check-sheet-search" class="check-sheet-search-input" type="search" placeholder="Search by skill..." autocomplete="off" />
+          </label>
+        </div>
 
         <div class="check-sheets-browser">
           <nav class="chapter-browser" aria-label="Check sheets by chapter">
@@ -1572,7 +1583,7 @@
               <a class="chapter-zip-link" id="chapter-zip-download" href="#" download hidden>Download All</a>
             </div>
             <ul class="check-sheet-list" id="check-sheet-document-list"></ul>
-            <p class="check-sheet-empty" id="check-sheet-empty" hidden>No chapter resources are available.</p>
+            <p class="check-sheet-empty" id="check-sheet-empty" role="status" aria-live="polite" hidden>No chapter resources are available.</p>
           </section>
         </div>
         <a href="#home" class="back-link">&larr; Back to all resources</a>
@@ -2165,7 +2176,15 @@
         const selectedChapterSummary = document.getElementById("selected-chapter-summary");
         const chapterZipDownload = document.getElementById("chapter-zip-download");
         const checkSheetEmpty = document.getElementById("check-sheet-empty");
+        const checkSheetSearch = document.getElementById("check-sheet-search");
         let selectedCheckSheetChapter = checkSheetChapters.length ? checkSheetChapters[0].number : null;
+
+        function matchingCheckSheetDocuments(chapter, query) {
+          if (!query || chapter.title.toLowerCase().includes(query)) return chapter.documents;
+          return chapter.documents.filter(function (documentInfo) {
+            return documentInfo.title.toLowerCase().includes(query);
+          });
+        }
 
         function showCheckSheetChapter(chapterNumber) {
           const chapter = checkSheetChapters.find(function (item) {
@@ -2173,18 +2192,20 @@
           });
           if (!chapter) return;
 
+          const query = checkSheetSearch.value.trim().toLowerCase();
+          const documents = matchingCheckSheetDocuments(chapter, query);
           selectedCheckSheetChapter = chapter.number;
           checkSheetChapterList.querySelectorAll(".chapter-button").forEach(function (button) {
             button.setAttribute("aria-pressed", String(Number(button.dataset.chapter) === chapter.number));
           });
           selectedChapterTitle.textContent = chapter.title;
-          selectedChapterSummary.textContent = chapter.count + (chapter.count === 1 ? " check sheet available" : " check sheets available");
+          selectedChapterSummary.textContent = documents.length + (documents.length === 1 ? " check sheet available" : " check sheets available");
           chapterZipDownload.href = chapter.zipHref;
           chapterZipDownload.download = "Chapter_" + String(chapter.number).padStart(2, "0") + "_Check_Sheets.zip";
-          chapterZipDownload.hidden = false;
+          chapterZipDownload.hidden = Boolean(query);
           checkSheetDocumentList.replaceChildren();
 
-          chapter.documents.forEach(function (documentInfo) {
+          documents.forEach(function (documentInfo) {
             const item = document.createElement("li");
             item.className = "check-sheet-item";
             const title = document.createElement("div");
@@ -2206,7 +2227,8 @@
             checkSheetDocumentList.append(item);
           });
 
-          checkSheetEmpty.hidden = chapter.documents.length !== 0;
+          checkSheetEmpty.textContent = "No chapter resources are available.";
+          checkSheetEmpty.hidden = documents.length !== 0;
         }
 
         checkSheetChapters.forEach(function (chapter) {
@@ -2226,6 +2248,37 @@
             showCheckSheetChapter(chapter.number);
           });
           checkSheetChapterList.append(button);
+        });
+
+        checkSheetSearch.addEventListener("input", function () {
+          const query = checkSheetSearch.value.trim().toLowerCase();
+          const matchingChapters = checkSheetChapters.filter(function (chapter) {
+            return matchingCheckSheetDocuments(chapter, query).length !== 0;
+          });
+
+          checkSheetChapterList.querySelectorAll(".chapter-button").forEach(function (button) {
+            button.hidden = !matchingChapters.some(function (chapter) {
+              return chapter.number === Number(button.dataset.chapter);
+            });
+          });
+
+          if (!matchingChapters.length) {
+            selectedChapterTitle.textContent = "No Check Sheets Found";
+            selectedChapterSummary.textContent = "";
+            chapterZipDownload.hidden = true;
+            checkSheetDocumentList.replaceChildren();
+            checkSheetEmpty.textContent = "No check sheets match your search.";
+            checkSheetEmpty.hidden = false;
+            checkSheetChapterList.querySelectorAll(".chapter-button").forEach(function (button) {
+              button.setAttribute("aria-pressed", "false");
+            });
+            return;
+          }
+
+          if (!matchingChapters.some(function (chapter) { return chapter.number === selectedCheckSheetChapter; })) {
+            selectedCheckSheetChapter = matchingChapters[0].number;
+          }
+          showCheckSheetChapter(selectedCheckSheetChapter);
         });
 
         if (selectedCheckSheetChapter === null) {
