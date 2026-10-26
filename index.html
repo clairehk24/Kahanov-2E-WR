@@ -2698,7 +2698,7 @@
         });
         document.querySelector(".skip-link").addEventListener("click", function (event) {
           event.preventDefault();
-          const main = document.querySelector('[data-view]:not([hidden]) main');
+          const main = document.querySelector("[data-view]:not([hidden]) main");
           if (main) {
             main.tabIndex = -1;
             main.focus({ preventScroll: true });
