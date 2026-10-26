@@ -47,6 +47,20 @@
     return line;
   }
 
+  function appendFormattedText(parent, value, italicizedPhrases) {
+    let offset = 0;
+    (italicizedPhrases || []).forEach((phrase) => {
+      const start = value.indexOf(phrase, offset);
+      if (start === -1) return;
+      parent.append(document.createTextNode(value.slice(offset, start)));
+      const emphasis = document.createElement("em");
+      emphasis.textContent = phrase;
+      parent.append(emphasis);
+      offset = start + phrase.length;
+    });
+    parent.append(document.createTextNode(value.slice(offset)));
+  }
+
   function correctAnswerText(question) {
     return question.options
       .filter((option) => option.correct)
@@ -132,6 +146,13 @@
     byId("quiz-question-kicker").textContent = "Question " + question.number + " of " + currentQuiz.questions.length + (question.type === "multiple" ? " · Select All That Apply" : question.type === "written" ? " · Written Response" : "");
     byId("quiz-question-title").textContent = question.prompt;
     answerControls.replaceChildren();
+    if (question.type === "written") {
+      answerControls.removeAttribute("role");
+      answerControls.removeAttribute("aria-labelledby");
+    } else {
+      answerControls.setAttribute("role", question.type === "multiple" ? "group" : "radiogroup");
+      answerControls.setAttribute("aria-labelledby", "quiz-question-title");
+    }
 
     if (question.type === "written") {
       const textarea = document.createElement("textarea");
@@ -169,7 +190,8 @@
           markDraft();
         });
         const choiceText = document.createElement("span");
-        choiceText.textContent = option.label + ". " + option.text;
+        choiceText.append(document.createTextNode(option.label + ". "));
+        appendFormattedText(choiceText, option.text, option.italicizedPhrases);
         label.append(input, choiceText);
         list.append(label);
       });
@@ -199,6 +221,8 @@
     session.hidden = false;
     results.hidden = true;
     renderQuestion();
+    byId("quiz-question-title").tabIndex = -1;
+    byId("quiz-question-title").focus({ preventScroll: true });
     session.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
 
@@ -282,6 +306,8 @@
       list.append(item);
     });
     byId("quiz-download-status").textContent = "";
+    byId("quiz-results-title").tabIndex = -1;
+    byId("quiz-results-title").focus({ preventScroll: true });
     results.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }
 
@@ -436,6 +462,40 @@
     byId("quiz-download-status").textContent = "Results PDF downloaded.";
   }
 
+  function downloadTextResults() {
+    const nameInput = byId("quiz-student-name");
+    const studentName = nameInput.value.trim();
+    if (!studentName) {
+      byId("quiz-download-status").textContent = "Enter your name to download a report for your instructor.";
+      nameInput.focus();
+      return;
+    }
+    const lines = [
+      "Chapter " + currentQuiz.number + " Quiz Results",
+      "Student: " + studentName,
+      "Completed: " + new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(completedAt),
+      "Score: " + score() + " of " + answers.length + " (" + (score() / answers.length * 100).toFixed(0) + "%)",
+      "",
+    ];
+    currentQuiz.questions.forEach((question, index) => {
+      const answer = answers[index];
+      lines.push("Question " + question.number + " — " + (answer.verdict ? "Correct" : "Needs Review") + (question.type === "written" ? " (self-checked)" : ""));
+      lines.push(question.prompt);
+      lines.push("Your answer: " + studentAnswerText(question, answer));
+      lines.push("");
+    });
+    const file = new Blob(["\uFEFF", lines.join("\r\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Chapter_" + String(currentQuiz.number).padStart(2, "0") + "_Quiz_Results.txt";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+    byId("quiz-download-status").textContent = "Accessible text results downloaded.";
+  }
+
   quizzes.forEach((quiz) => {
     const label = document.createElement("label");
     label.className = "chapter-option";
@@ -448,6 +508,7 @@
       chapterSummary.textContent = "Chapter " + quiz.number + " selected";
       startButton.disabled = false;
       chapterPicker.open = false;
+      startButton.focus();
     });
     const text = document.createElement("span");
     text.textContent = "Chapter " + quiz.number + " (" + quiz.questions.length + " questions)";
@@ -478,4 +539,5 @@
     chapterSummary.focus({ preventScroll: true });
   });
   byId("quiz-download").addEventListener("click", downloadResults);
+  byId("quiz-download-text").addEventListener("click", downloadTextResults);
 })();

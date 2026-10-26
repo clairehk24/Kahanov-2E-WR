@@ -65,6 +65,17 @@
         transform: translateY(0);
       }
 
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       .page-shell,
       .interior-page {
         min-height: 100vh;
@@ -1619,7 +1630,7 @@
             <button class="video-close" id="video-close" type="button" aria-label="Close video player">Close</button>
           </div>
           <div class="video-frame-wrap">
-            <iframe id="video-frame" src="" title="" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            <iframe id="video-frame" src="" title="Skill video player" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
           </div>
         </section>
 
@@ -1983,12 +1994,13 @@
             <button class="study-control" id="exit-study" type="button">Choose chapters</button>
           </div>
 
-          <button class="flashcard-face" id="flashcard-face" type="button" aria-label="Show the definition">
+          <button class="flashcard-face" id="flashcard-face" type="button">
             <span class="flashcard-side-label" id="flashcard-side-label">Term</span>
             <span class="flashcard-term" id="flashcard-term"></span>
             <span class="flashcard-hint" id="flashcard-hint">Select to reveal the definition</span>
             <span class="flashcard-definition" id="flashcard-definition" hidden></span>
           </button>
+          <span class="visually-hidden" id="flashcard-announcement" role="status" aria-live="polite"></span>
 
           <div class="rating-actions" id="rating-actions" hidden>
             <button class="mark-correct" id="mark-correct" type="button">I got it correct</button>
@@ -2076,6 +2088,7 @@
           <p class="quiz-status" id="quiz-download-status" role="status" aria-live="polite"></p>
           <div class="quiz-result-actions">
             <button class="primary" id="quiz-download" type="button">Download Results PDF</button>
+            <button id="quiz-download-text" type="button">Download Accessible Results (TXT)</button>
             <button id="quiz-review" type="button">Review Answers</button>
             <button id="quiz-retry" type="button">Retry Quiz</button>
             <button id="quiz-choose-chapter" type="button">Choose Another Chapter</button>
@@ -2102,7 +2115,7 @@
 
         function closeVideo(returnFocus) {
           videoFrame.src = "";
-          videoFrame.title = "";
+          videoFrame.title = "Skill video player";
           videoPlayerTitle.textContent = "";
           videoPlayerPanel.hidden = true;
 
@@ -2275,7 +2288,11 @@
             return;
           }
 
-          if (!matchingChapters.some(function (chapter) { return chapter.number === selectedCheckSheetChapter; })) {
+          if (
+            !matchingChapters.some(function (chapter) {
+              return chapter.number === selectedCheckSheetChapter;
+            })
+          ) {
             selectedCheckSheetChapter = matchingChapters[0].number;
           }
           showCheckSheetChapter(selectedCheckSheetChapter);
@@ -2382,6 +2399,7 @@
         const flashcardTerm = document.getElementById("flashcard-term");
         const flashcardHint = document.getElementById("flashcard-hint");
         const flashcardDefinition = document.getElementById("flashcard-definition");
+        const flashcardAnnouncement = document.getElementById("flashcard-announcement");
         const ratingActions = document.getElementById("rating-actions");
         const studyStatus = document.getElementById("study-status");
         const previousCardButton = document.getElementById("previous-card");
@@ -2506,12 +2524,25 @@
           definitionIsVisible = false;
           flashcardSideLabel.textContent = "Term · Chapter " + card.chapter;
           flashcardTerm.textContent = card.term;
-          flashcardDefinition.textContent = card.definition;
+          const italicPhrases = card.italicizedPhrases || (card.italicizedPhrase ? [card.italicizedPhrase] : []);
+          const definitionParts = [];
+          let definitionOffset = 0;
+          italicPhrases.forEach(function (phrase) {
+            const phraseStart = card.definition.indexOf(phrase, definitionOffset);
+            if (phraseStart === -1) return;
+            definitionParts.push(document.createTextNode(card.definition.slice(definitionOffset, phraseStart)));
+            const emphasis = document.createElement("em");
+            emphasis.textContent = phrase;
+            definitionParts.push(emphasis);
+            definitionOffset = phraseStart + phrase.length;
+          });
+          definitionParts.push(document.createTextNode(card.definition.slice(definitionOffset)));
+          flashcardDefinition.replaceChildren(...definitionParts);
           flashcardTerm.hidden = false;
           flashcardDefinition.hidden = true;
           flashcardHint.hidden = false;
           flashcardHint.textContent = "Select to reveal the definition";
-          flashcardFace.setAttribute("aria-label", "Show the definition for " + card.term);
+          flashcardAnnouncement.textContent = "Card " + (sessionIndex + 1) + " of " + sessionCards.length + ". Term: " + card.term;
           ratingActions.hidden = true;
           const rating = cardRatings.get(card.id);
           studyStatus.textContent =
@@ -2543,6 +2574,7 @@
           studySessionMode.textContent = mode === "missed" ? "Custom review deck" : "Selected chapters";
           studySession.hidden = false;
           renderStudyCard();
+          flashcardFace.focus({ preventScroll: true });
           studySession.scrollIntoView({
             behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
             block: "start",
@@ -2585,7 +2617,7 @@
           flashcardDefinition.hidden = !definitionIsVisible;
           flashcardSideLabel.textContent = definitionIsVisible ? "Definition · Chapter " + card.chapter : "Term · Chapter " + card.chapter;
           flashcardHint.hidden = definitionIsVisible;
-          flashcardFace.setAttribute("aria-label", definitionIsVisible ? "Show the term again: " + card.term : "Show the definition for " + card.term);
+          flashcardAnnouncement.textContent = definitionIsVisible ? "Definition: " + card.definition : "Term: " + card.term;
           ratingActions.hidden = !definitionIsVisible;
         });
 
@@ -2663,6 +2695,15 @@
 
         window.addEventListener("hashchange", function () {
           showView(true);
+        });
+        document.querySelector(".skip-link").addEventListener("click", function (event) {
+          event.preventDefault();
+          const main = document.querySelector('[data-view]:not([hidden]) main');
+          if (main) {
+            main.tabIndex = -1;
+            main.focus({ preventScroll: true });
+            main.scrollIntoView({ block: "start" });
+          }
         });
         showView(false);
       })();
